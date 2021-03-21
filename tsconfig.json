@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es5",
+    "sourceMap": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "skipLibCheck": true,
+    "outDir": "../output/ts",
+    "lib": ["dom", "es5", "scripthost", "es2015.promise"]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

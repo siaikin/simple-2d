@@ -1,16 +1,17 @@
-const { getCommonConfig } = require('./webpack.config.common.js');
-const { commonConfig, versionInfo } = getCommonConfig({
-  patchset: 0,
-  status: 8,
-  redundant: 0
-});
+import {commonVersionMaker, commitSHA1, commitSHA1Short} from './version.js';
 
-const config = {
-  commonConfig,
+const versionInfo = {
+  version: commonVersionMaker(),
+  gitHash: commitSHA1(),
+  gitHashShort: commitSHA1Short(),
+  buildTime: new Date().toISOString(),
+};
+
+const docName = 'simple-2d';
+const outputPath = './output';
+
+export {
   versionInfo,
-  docName: 'simple-2d',
-  outputPath: './output'
-}
-
-module.exports = config;
-process.stdout.write(config.versionInfo.version);
+  docName,
+  outputPath
+};

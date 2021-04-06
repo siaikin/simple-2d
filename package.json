@@ -4,8 +4,8 @@
   "description": "a simple HTML5 canvas library",
   "main": "index.js",
   "scripts": {
-    "build": "webpack --config webpack.config.developerment.js --env debug",
-    "serve": "webpack --config webpack.config.developerment.js -w --env debug",
+    "build": "rollup --config rollup.config.js",
+    "watch": "rollup --config rollup.config.js -w",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,20 +18,74 @@
     "url": "https://github.com/siaikin/simple-2d/issues"
   },
   "homepage": "https://github.com/siaikin/simple-2d#readme",
-  "dependencies": {},
+  "dependencies": {
+    "tslib": "^2.1.0"
+  },
   "devDependencies": {
+    "@rbnlffl/rollup-plugin-eslint": "^1.1.4",
+    "@rollup/plugin-eslint": "^8.0.1",
+    "@rollup/plugin-replace": "^2.4.2",
+    "@rollup/plugin-typescript": "^8.2.1",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
-    "copy-webpack-plugin": "^8.0.0",
     "cz-conventional-changelog": "^3.3.0",
-    "eruda-webpack-plugin": "^1.2.0",
-    "eslint": "^7.22.0",
-    "eslint-webpack-plugin": "^2.5.2",
-    "html-webpack-plugin": "^5.3.1",
+    "rollup-plugin-serve": "^1.1.0",
     "ts-loader": "^8.0.18",
-    "typescript": "^4.2.3",
-    "webpack": "^5.27.0",
-    "webpack-bundle-analyzer": "^4.4.0",
-    "webpack-cli": "^4.5.0"
+    "typescript": "^4.2.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog",
+      "types": {
+        "feat": {
+          "description": "A new feature",
+          "title": "Features"
+        },
+        "version": {
+          "description": "release a new version",
+          "title": "version"
+        },
+        "fix": {
+          "description": "A bug fix",
+          "title": "Bug Fixes"
+        },
+        "docs": {
+          "description": "Documentation only changes",
+          "title": "Documentation"
+        },
+        "style": {
+          "description": "Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)",
+          "title": "Styles"
+        },
+        "refactor": {
+          "description": "A code change that neither fixes a bug nor adds a feature",
+          "title": "Code Refactoring"
+        },
+        "perf": {
+          "description": "A code change that improves performance",
+          "title": "Performance Improvements"
+        },
+        "test": {
+          "description": "Adding missing tests or correcting existing tests",
+          "title": "Tests"
+        },
+        "build": {
+          "description": "Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)",
+          "title": "Builds"
+        },
+        "ci": {
+          "description": "Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)",
+          "title": "Continuous Integrations"
+        },
+        "chore": {
+          "description": "Other changes that don't modify src or test files",
+          "title": "Chores"
+        },
+        "revert": {
+          "description": "Reverts a previous commit",
+          "title": "Reverts"
+        }
+      }
+    }
   }
 }

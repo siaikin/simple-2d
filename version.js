@@ -1,5 +1,5 @@
-const child_process = require('child_process');
-const packageJSON = require('./package.json');
+import child_process from 'child_process';
+import packageJSON from './package.json';
 
 function commonVersionMaker() {
   return packageJSON.version;
@@ -13,7 +13,7 @@ function commitSHA1Short() {
   return child_process.execSync('git show -s --format=%h').toString().trim();
 }
 
-module.exports = {
+export {
   commonVersionMaker,
   commitSHA1,
   commitSHA1Short,

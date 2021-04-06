@@ -9,7 +9,7 @@
     "importHelpers": true,
     "skipLibCheck": true,
     "outDir": "../output/ts",
-    "lib": ["dom", "es5", "scripthost", "es2015.promise"]
+    "lib": ["dom", "ES6"]
   },
   "exclude": [
     "node_modules"

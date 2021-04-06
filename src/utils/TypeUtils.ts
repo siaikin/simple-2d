@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 /**
  * 类型定义
  */
@@ -24,7 +22,7 @@ export enum TYPE {
   String = '[object String]',
   Symbol = '[object Symbol]',
   Undefined = '[object Undefined]',
-  UnKnown = '[object Unknown]',
+  Unknown = '[object Unknown]',
   Promise = '[object Promise]'
 }
 
@@ -39,7 +37,7 @@ export const TYPE_COMPOSE: { [key: string]: Array<TYPE> } = {
  * 返回变量的类型
  * @param variable
  */
-export function typeOf(variable: any): TYPE {
+export function typeOf(variable: unknown): TYPE {
   let type: TYPE;
   if (typeof variable === 'undefined' || variable === undefined) type = TYPE.Undefined;
   else if (variable === null) type = TYPE.Null;
@@ -54,7 +52,7 @@ export function typeOf(variable: any): TYPE {
  * @param typeArray - 预选类型
  * @return {boolean} - `variable`的类型存在与`typeArray`中返回`true`，不存在返回`false`
  */
-export function typeIs(variable: any, ...typeArray: Array<TYPE>): boolean {
+export function typeIs(variable: unknown, ...typeArray: Array<TYPE>): boolean {
   const varType: TYPE = typeOf(variable);
   for (let i: number = typeArray.length; i--;) {
     if (varType === typeArray[i]) return true;
@@ -65,10 +63,10 @@ export function typeIs(variable: any, ...typeArray: Array<TYPE>): boolean {
 /**
  * 判断变量类型是否为{@link string}
  * @param variable
- * @param [notNull=true] - 是否不允许空字符串, 即 `''`
+ * @param [notNull=true] 是否不允许空字符串, 即 `''`
  */
-export function typeIsString(variable: any, notNull = true): variable is string {
-  return typeIs(variable, TYPE.String) && (notNull ? variable.length > 0 : true);
+export function typeIsString(variable: unknown, notNull = true): variable is string {
+  return typeIs(variable, TYPE.String) && (notNull ? (variable as string).length > 0 : true);
 }
 
 /**
@@ -76,7 +74,7 @@ export function typeIsString(variable: any, notNull = true): variable is string 
  * @param variable
  * @param [notNaN=true] - 是否不允许变量为{@link NaN}
  */
-export function typeIsNumber(variable: any, notNaN = true): variable is number {
+export function typeIsNumber(variable: unknown, notNaN = true): variable is number {
   return typeIs(variable, TYPE.Number) && (notNaN ? !Number.isNaN(variable) : true);
 }
 
@@ -84,35 +82,35 @@ export function typeIsNumber(variable: any, notNaN = true): variable is number {
  * 判断变量是否非空, 即变量不为 `undefined` 和 `null`
  * @param variable
  */
-export function notUAN(variable: any): variable is any {
+export function notUAN(variable: unknown): variable is Exclude<unknown, undefined | null> {
   return !typeIs(variable, ...TYPE_COMPOSE.UAN);
 }
 
 /**
- * 判断变量类型是否为{@link function}, 同名函数为{@link isFunction}
+ * 判断变量类型是否为{@link function}
  * @param variable
  */
-export function typeIsFunction(variable: any): variable is Function {
+export function typeIsFunction(variable: unknown): variable is (...args: Array<unknown>) => unknown {
   return typeIs(variable, TYPE.Function);
 }
 
 /**
- * 判断变量类型是否为 `true`, 同名函数为{@link isTrue}
+ * 判断变量类型是否为 `true`
  * @param variable
  */
-export function typeIsTrue(variable: any): variable is boolean {
-  return typeIs(variable, TYPE.Boolean) && variable;
+export function typeIsTrue(variable: unknown): variable is boolean {
+  return typeIs(variable, TYPE.Boolean) && variable as boolean;
 }
 
-export function typeIsFalse(variable: any): variable is boolean {
-  return typeIs(variable, TYPE.Boolean) && !variable;
+export function typeIsFalse(variable: unknown): variable is boolean {
+  return typeIs(variable, TYPE.Boolean) && !(variable as boolean);
 }
 
-export function typeIsMediaStream(variable: any): variable is MediaStream {
+export function typeIsMediaStream(variable: unknown): variable is MediaStream {
   return typeIs(variable, TYPE.MediaStream, TYPE.LocalMediaStream);
 }
 
-export function typeIsMediaStreamTrack(variable: any): variable is MediaStreamTrack {
+export function typeIsMediaStreamTrack(variable: unknown): variable is MediaStreamTrack {
   return typeIs(
     variable,
     TYPE.MediaStreamTrack,
@@ -122,195 +120,41 @@ export function typeIsMediaStreamTrack(variable: any): variable is MediaStreamTr
   );
 }
 
-export function typeIsObject(variable: any): variable is Object {
+export function typeIsObject(variable: unknown): variable is Record<string | number, unknown> {
   return typeIs(variable, TYPE.Object);
 }
 
-export function typeIsArray(variable: any): variable is Array<any> {
+export function typeIsArray(variable: unknown): variable is Array<unknown> {
   return typeIs(variable, TYPE.Array);
 }
 
-export function typeIsPromise(variable: any): variable is Promise<any> {
+export function typeIsPromise(variable: unknown): variable is Promise<unknown> {
   return typeIs(variable, TYPE.Promise);
 }
 
-export function typeIsDate(variable: any, isValid = false): variable is Date {
-  return typeIs(variable, TYPE.Date) && (isValid ? !Number.isNaN(variable.getTime()) : true);
+export function typeIsDate(variable: unknown, isValid = false): variable is Date {
+  return typeIs(variable, TYPE.Date) && (isValid ? !Number.isNaN((variable as Date).getTime()) : true);
 }
 
-export function typeIsThrow(variable: any, ...typeArray: Array<TYPE>): Boolean | Error {
+export function typeIsThrow(variable: unknown, ...typeArray: Array<TYPE>): boolean {
   if (typeIs(variable, ...typeArray)) {
     return true;
   } else {
-    return new Error(`type of variable ${JSON.stringify(variable)} is not ${JSON.stringify(typeArray)}`);
+    throw new Error(`type of variable ${JSON.stringify(variable)} is not ${JSON.stringify(typeArray)}`);
   }
 }
 
-export function typeIsThrowMulti(variableParameterArr: Array<[any, ...Array<TYPE>]>): {accept?: boolean, error?: Error} {
-  if (!typeIsArray(variableParameterArr)) return {error: new Error('variableParameterArr is not a array')};
+export function typeIsThrowMulti(variableParameterArr: Array<[unknown, ...Array<TYPE>]>): boolean {
+  if (!typeIsArray(variableParameterArr)) throw new Error('variableParameterArr is not a array');
+  let _result = true;
 
-  for (let i = variableParameterArr.length, variableParameter: [any, ...Array<TYPE>], result: any; i--, variableParameter = variableParameterArr[i];) {
+  for (let i = variableParameterArr.length, variableParameter: [unknown, ...Array<TYPE>], result: unknown; i--, variableParameter = variableParameterArr[i];) {
     result = typeIsThrow(...variableParameter);
-    if (!typeIsTrue(result)) return {accept: false, error: result};
-  }
-
-  return {accept: true};
-}
-
-/**
- * 深度比较两个变量是否相同
- * 允许的比较类型: boolean, null, undefined, number, string, object, array
- * @param variable
- * @param other
- */
-export function equals(variable: any, other: any): boolean {
-  const varType = typeOf(variable), otherType = typeOf(other);
-  let result = true;
-
-  if (varType !== otherType) result = false;
-  else {
-    if (varType === TYPE.Array) {
-      if (variable.length !== other.length) result = false;
-      else {
-        for (let i = 0; i < variable.length; i++) {
-          if (!equals(variable[i], other[i])) {
-            result = false;
-            break;
-          }
-        }
-      }
-    } else if (varType === TYPE.Object) {
-      const
-      varKeys = Object.keys(variable),
-      otherKeys = Object.keys(other);
-      if (varKeys.length !== otherKeys.length) result = false;
-      else {
-        for (let i = varKeys.length; i--;) {
-          if (varKeys[i] !== otherKeys[i] || !equals(variable[varKeys[i]], other[otherKeys[i]])) {
-            result = false;
-            break;
-          }
-        }
-      }
-    } else {
-      switch (varType) {
-        case TYPE.Boolean:
-        case TYPE.Null:
-        case TYPE.Number:
-        case TYPE.String:
-        case TYPE.Undefined:
-          result = Object.is(variable, other);
-          break;
-        default:
-          result = false;
-          throw new Error('complex type detected! only support simple type (e.g boolean, null, undefined, number, string, object, array).')
-      }
+    if (!typeIsTrue(result)) {
+      _result = false;
+      break;
     }
   }
 
-  return result;
+  return _result;
 }
-
-/**
- * @param target
- */
-export function clone(target: any): any {
-  const targetType = typeOf(target);
-  let result: any;
-
-  switch (targetType) {
-    case TYPE.Object:
-      result = {};
-      const varKeys = Object.keys(target);
-      for (let i = 0; i < varKeys.length; i++) {
-        result[varKeys[i]] = clone(target[varKeys[i]]);
-      }
-
-      break;
-    case TYPE.Array:
-      result = [];
-      for (let i = 0; i < target.length; i++) {
-        result.push(clone(target[i]));
-      }
-      break;
-    case TYPE.String:
-    case TYPE.Number:
-    case TYPE.Boolean:
-    case TYPE.Null:
-    case TYPE.Undefined:
-    case TYPE.Function:
-      result = target;
-      break;
-    default:
-      throw new Error(`complex type detected! only support simple type (e.g boolean, null, undefined, number, string, object, array). but get [${targetType}] type`)
-  }
-
-  return result;
-}
-
-/**
- * 合并两个对象
- * @param target
- * @param source
- */
-export function merge<T>(target: T, source: T): T {
-  const targetType = typeOf(target), sourceType = typeOf(source);
-  let result;
-
-  if (targetType !== sourceType) {
-    throw new Error('target type not equal source type!');
-  } else {
-    switch (sourceType) {
-      case TYPE.Object:
-      case TYPE.Array:
-        result = recursionFunc(clone(target), source);
-        break;
-      default:
-        throw new Error('simple type detected! only support complex type (just only object and array)');
-    }
-  }
-
-  function recursionFunc(_target: any, _source: any) {
-    const targetType = typeOf(_target), sourceType = typeOf(_source), typeEqual = targetType === sourceType;
-    if (!typeIsTrue(typeEqual) || (targetType !== TYPE.Object && targetType !== TYPE.Array)) return undefined;
-
-    switch (targetType) {
-      case TYPE.Object:
-        const _sourceKeys = Object.keys(_source);
-        let _tagVal, _tagValType, _srcVal, _srcValType, key;
-        for (let i = 0; i < _sourceKeys.length; i++) {
-          key = _sourceKeys[i];
-          _tagVal = _target[key];
-          _tagValType = typeOf(_tagVal);
-          _srcVal = _source[key];
-          _srcValType = typeOf(_srcVal);
-
-          if (_tagValType === _srcValType) {
-            switch (_srcValType) {
-              case TYPE.Object:
-              case TYPE.Array:
-                _target[key] = merge(_target[key], _source[key]);
-                break;
-              default:
-                _target[key] = _source[key];
-            }
-          } else if (notUAN(_source[key])) {
-            _target[key] = _source[key];
-          }
-        }
-        break;
-      case TYPE.Array:
-        _target.push(..._source);
-        break;
-    }
-
-    return _target;
-  }
-
-  return result;
-}
-
-export const isBrowser = typeof window !== 'undefined';
-
-//@ts-ignore
-export const isWeChat = typeof wx !== 'undefined';
